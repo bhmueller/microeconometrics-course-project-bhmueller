@@ -9,6 +9,7 @@ dependencies:
 - scipy
 - statsmodels
 - pip
+- linearmodels
 - pip:
 
 
