@@ -1,4 +1,4 @@
-# Student Project: Galiani et al. (2011) Revisited
+# Replication Study: Galiani, Rossi, and Schargrodsky (2011) Revisited
 
 I replicate the findings of the following journal article:
 
