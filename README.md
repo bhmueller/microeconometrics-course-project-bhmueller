@@ -27,11 +27,13 @@ Please ensure that a brief description of your project is included in the [READM
        width="109" height="20">
 </a>
 
+[![Build Status](https://travis-ci.org/HumanCapitalAnalysis/microeconometrics-course-project-bhmueller.svg?branch=master)](https://travis-ci.org/HumanCapitalAnalysis/microeconometrics-course-project-bhmueller)
+
 ## Reproducibility
 
 To ensure full reproducibility of your project, please try to set up a [Travis CI](https://travis-ci.org) as your continuous integration service. An introductory tutorial for [conda](https://conda.io) and [Travis CI](https://docs.travis-ci.com/) is provided [here](https://github.com/HumanCapitalAnalysis/template-course-project/blob/master/tutorial_conda_travis.ipynb). While not at all mandatory, setting up a proper continuous integration workflow is an extra credit that can improve the final grade.
 
-[![Build Status](https://travis-ci.org/HumanCapitalAnalysis/microeconometrics-course-project-bhmueller.svg?branch=master)](https://travis-ci.org/HumanCapitalAnalysis/microeconometrics-course-project-bhmueller)
+
 
 In some cases you might not be able to run parts of your code on  [Travis CI](https://travis-ci.org) as, for example, the computation of results takes multiple hours. In those cases you can add the result in a file to your repository and load it in the notebook. See below for an example code.
 
