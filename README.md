@@ -17,8 +17,9 @@ Galiani, Sebastian, Martín A. Rossi, and Ernesto Schargrodsky. 2011. "Conscript
        src="https://mybinder.org/badge_logo.svg"
        width="109" height="20">
 </a>
-[![Build Status](https://travis-ci.org/HumanCapitalAnalysis/microeconometrics-course-project-bhmueller.svg?branch=master)](https://travis-ci.org/HumanCapitalAnalysis/microeconometrics-course-project-bhmueller)
 
+[![Build Status](https://travis-ci.org/HumanCapitalAnalysis/microeconometrics-course-project-bhmueller.svg?branch=master)](https://travis-ci.org/HumanCapitalAnalysis/microeconometrics-course-project-bhmueller)
+</a>
 ## Summary
 
 Galiani et al. (2011) aim at studying the causal effect of serving in the military on subsequent criminal behaviour. They use administrative data on the Argentine draft lottery and criminal records. Since failing medical examination before being drafted into the military is endogenous, Galiani et al. instrument conscription by *draft eligible*, a variable indicating whether a unit of observation was randomly chosen to join military service. The unit of observation are all individuals in birth cohort c sharing the same last three digits of the national ID.
