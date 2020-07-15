@@ -17,7 +17,9 @@ from linearmodels import IV2SLS
 
 # Get significance asterix.
 def significance(pval):
-    if pval <= 0.01:
+    if type(pval) == str:
+        star = ''
+    elif pval <= 0.01:
         star = '***'
     elif pval <= 0.05:
         star = '**'
