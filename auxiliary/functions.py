@@ -392,3 +392,266 @@ def table_4(df):
     print('rates outside the cohorts of 1958 to 1962, in all cases we use the compliance rates for this period).                            ')
     print('*** Significant at 1 percent level.')
     print(' ** Significant at 5 percent level.')
+    
+# Table 6.
+def table_6():
+    constant, highnumber, conscription, crimerate, malvinas, navy, origin, cohorts, districts, hn_malvinas, df = get_variables()
+    df_reg = df[df.cohort > 1957][df.cohort < 1963].copy()
+
+    reg_sm = []
+    pval_sm = []
+    std_sm = []
+    change_sm = []
+    for crime in ['arms', 'property', 'sexual', 'murder', 'threat', 'drug', 'whitecollar']:
+        # Dependent variable: crime
+        y = df_reg.loc[:, crime]
+        rslts = IV2SLS(y, df_reg[constant + cohorts[29: 33]], df_reg['sm'], df_reg['highnumber']).fit()
+        
+        # Get percent change.
+        ineligible_mean = df_reg[crime][df_reg.highnumber == 0].mean()  # Mean crime rate of ineligible ID-groups by type of crime.
+        change = ((rslts.params.sm)/(ineligible_mean))
+    
+        reg_sm.append(rslts.params.sm)
+        pval_sm.append(rslts.pvalues.sm)
+        std_sm.append(rslts.std_errors.sm)
+        change_sm.append(change)
+        
+    print('\033[1m' 'Table 6 - Estimated Impact of Conscription on Crime rates, by Type of Crime' '\033[0m')
+    print(128*'_')
+    # Header.
+    print('{:<15s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}'\
+          .format('Dependent Var.', 'Weapons', "", 'Property', "", 'Sexual Attack', "", 'Murder', "", 'Threat', "", 'Drug Traff.', "", \
+                  'White Collar', '', ''))
+    print('{:<15s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}'\
+          .format('Cohort', '1958-1962', '', "1958-1962", '', "1958-1962", '', "1958-1962", '', "1958-1962", '', "1958-1962", '', \
+                  "1958-1962", '', ''))
+    print('{:<15s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}'\
+          .format('', '(1)', '', '(2)', '', '(3)', '', '(4)', '', '(5)', '', '(6)', '', \
+                  '(7)', '', ''))
+    print(128*'_')
+
+
+    for i in range(len(reg_sm)):
+        if i == 0:
+            print('{:<15s}'.format("Conscription"), end="")
+        print('\033[1m' '{:>13.5f}{:<3s}' '\033[0m'.format(reg_sm[i], significance(pval_sm[i])), end="")
+    
+    print('\n')
+
+    for i in range(len(std_sm)):
+        if i == 0:
+            print('{:<15s}'.format(''), end="")
+        print('{:>13.5f}{:<3s}'.format(std_sm[i], ''), end="")
+    
+    print('\n')
+
+    for i in range(len(change_sm)):
+        if i == 0:
+            print('{:<15s}'.format('Percent change'), end="")
+        print('\033[1m' '{:>13.2f}{:<3s}' '\033[0m'.format(change_sm[i], ''), end="")
+    
+    print('\n')
+
+    print('{:<15s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}'\
+          .format('Observations', '5000', '', '5000', '', '5000', '', '5000', '', '5000', '', '5000', '', \
+                  '5000', '', ''))
+
+    print('{:<15s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}'\
+          .format('Method', '2SLS', '', '2SLS', '', '2SLS', '', '2SLS', '', '2SLS', '', '2SLS', '', '2SLS', '', ''))
+    print(128*'_')
+    print('Notes: Robust standard errors are shown below estimates. The level of observation is the cohort-ID number combination. All mo-')
+    print('dels include cohort dummies. The instrument for Consription is Draft eligible. Percent change is calculated as 100*Estimate/mean')
+    print('dependent variable of draft-ineligible men.')
+    print('*** Significant at 1 percent level.')
+    print(' ** Significant at 5 percent level.')
+
+# Table 5.
+def table_5():
+    
+    # Get data.
+    constant, highnumber, conscription, crimerate, malvinas, navy, origin, cohorts, districts, hn_malvinas, df = get_variables()
+    
+    # Lists for regression results.
+    est_hn = []
+    std_hn = []
+    est_mal = []
+    std_mal = []
+    est_na = []
+    std_na = []
+    n_obs = []
+    pval_hn = []
+    pval_mal = []
+    pval_na = []
+    
+    # Col 1.
+    
+    df_29_65 = df[df.cohort > 1928][df.cohort < 1966][highnumber + hn_malvinas + constant + cohorts[0:36] + crimerate].copy().dropna(axis=0)
+    X = df_29_65[highnumber + hn_malvinas + constant + cohorts[0:36]].copy()
+    y = df_29_65.loc[:, 'crimerate']
+    rslts = sm.OLS(y, X).fit()
+    
+    est_hn.append(rslts.params.highnumber)
+    std_hn.append(rslts.HC0_se.highnumber)
+    est_mal.append(rslts.params.hn_malvinas)
+    std_mal.append(rslts.HC0_se.hn_malvinas)
+    est_na.append('')
+    std_na.append('')
+    n_obs.append(rslts.nobs)
+    pval_hn.append(rslts.pvalues.highnumber)
+    pval_mal.append(rslts.pvalues.hn_malvinas)
+    pval_na.append('')
+    
+    # Col 2.
+    
+    df_58_65 = df[df.cohort > 1957][df.cohort < 1966][highnumber + hn_malvinas + constant + cohorts[29:36] + crimerate].copy().dropna(axis=0)
+    X = df_58_65[highnumber + hn_malvinas + constant + cohorts[29:36]].copy()
+    y = df_58_65.loc[:, 'crimerate']
+    rslts = sm.OLS(y, X).fit()
+    
+    est_hn.append(rslts.params.highnumber)
+    std_hn.append(rslts.HC0_se.highnumber)
+    est_mal.append(rslts.params.hn_malvinas)
+    std_mal.append(rslts.HC0_se.hn_malvinas)
+    est_na.append('')
+    std_na.append('')
+    n_obs.append(rslts.nobs)
+    pval_hn.append(rslts.pvalues.highnumber)
+    pval_mal.append(rslts.pvalues.hn_malvinas)
+    pval_na.append('')
+    
+    # Col 3.
+    
+    df_29_65 = df[df.cohort > 1928][df.cohort < 1966][highnumber + navy + constant + cohorts[0:36] + crimerate].copy().dropna(axis=0)
+    X = df_29_65[highnumber + navy + constant + cohorts[0:36]].copy()
+    y = df_29_65.loc[:, 'crimerate']
+    rslts = sm.OLS(y, X).fit()
+    
+    est_hn.append(rslts.params.highnumber)
+    std_hn.append(rslts.HC0_se.highnumber)
+    est_mal.append('')
+    std_mal.append('')
+    est_na.append(rslts.params.navy)
+    std_na.append(rslts.HC0_se.navy)
+    n_obs.append(rslts.nobs)
+    pval_hn.append(rslts.pvalues.highnumber)
+    pval_mal.append('')
+    pval_na.append(rslts.pvalues.navy)
+    
+    # Col 4.
+    df_58_65 = df[df.cohort > 1957][df.cohort < 1966][highnumber + navy + constant + cohorts[29:36] + crimerate].copy().dropna(axis=0)
+    X = df_58_65[highnumber + navy + constant + cohorts[29:36]].copy()
+    y = df_58_65.loc[:, 'crimerate']
+    rslts = sm.OLS(y, X).fit()
+    
+    est_hn.append(rslts.params.highnumber)
+    std_hn.append(rslts.HC0_se.highnumber)
+    est_mal.append('')
+    std_mal.append('')
+    est_na.append(rslts.params.navy)
+    std_na.append(rslts.HC0_se.navy)
+    n_obs.append(rslts.nobs)
+    pval_hn.append(rslts.pvalues.highnumber)
+    pval_mal.append('')
+    pval_na.append(rslts.pvalues.navy)
+    
+    # Print table.
+    print('\033[1m' 'Table 5 - Estimated Impact of Conscription on Crime Rates for Peacetime' '\033[0m')
+    print('\033[1m' 'versus Wartime Service and 1-Year versus 2-Year Service' '\033[0m')
+    print(80*'_')
+
+    print('{:<15s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}'\
+          .format('Cohort', '1958-1962', '', "1958-1962", '', "1958-1962", '', "1958-1962", '', ''))
+
+    print('{:<15s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}'\
+          .format('', '(1)', '', '(2)', '', '(3)', '', '(4)', '', ''))
+    print(80*'_')
+    
+    # Draft Eligible.
+
+    for i in range(len(est_hn)):
+        if i == 0:
+            print('{:<15s}'.format("Draft Eligible"), end="")
+        if type(est_hn[i]) == str:
+            print('{:>13s}{:<3s}'.format('', ''), end="")
+        else:   
+            print('\033[1m' '{:>13.5f}{:<3s}' '\033[0m'.format(est_hn[i], significance(pval_hn[i])), end="")
+    
+    print('\n')
+
+    for i in range(len(std_hn)):
+        if i == 0:
+            print('{:<15s}'.format(''), end="")
+        if type(est_hn[i]) == str:
+            print('{:>13s}{:<3s}'.format('', ''), end="")
+        else:
+            print('{:>13.4f}{:<3s}'.format(std_hn[i], ''), end="")
+        
+    print('\n')
+    
+    # Falkland War.
+        
+    for i in range(len(est_mal)):
+        if i == 0:
+            print('{:<15s}'.format("War Eligible"), end="")
+        if type(est_mal[i]) == str:
+            print('{:>13s}{:<3s}'.format('', ''), end="")
+        else:   
+            print('\033[1m' '{:>13.4f}{:<3s}' '\033[0m'.format(est_mal[i], significance(pval_mal[i])), end="")
+    
+    print('\n')
+
+    for i in range(len(std_mal)):
+        if i == 0:
+            print('{:<15s}'.format(''), end="")
+        if type(est_mal[i]) == str:
+            print('{:>13s}{:<3s}'.format('', ''), end="")
+        else:
+            print('{:>13.4f}{:<3s}'.format(std_mal[i], ''), end="")
+            
+    print('\n')
+    
+    # Navy
+    
+    for i in range(len(est_na)):
+        if i == 0:
+            print('{:<15s}'.format("Navy Eligible"), end="")
+        if type(est_na[i]) == str:
+            print('{:>13s}{:<3s}'.format('', ''), end="")
+        else:   
+            print('\033[1m' '{:>13.4f}{:<3s}' '\033[0m'.format(est_na[i], significance(pval_na[i])), end="")
+    
+    print('\n')
+
+    for i in range(len(std_na)):
+        if i == 0:
+            print('{:<15s}'.format(''), end="")
+        if type(est_na[i]) == str:
+            print('{:>13s}{:<3s}'.format('', ''), end="")
+        else:
+            print('{:>13.4f}{:<3s}'.format(std_na[i], ''), end="")
+    
+    
+    print('\n')
+    
+    # Obs.
+
+    for i in range(len(n_obs)):
+        if i == 0:
+            print('{:<15s}'.format('Observations'), end="")
+        print('\033[1m' '{:>13.0f}{:<3s}' '\033[0m'.format(n_obs[i], ''), end="")
+
+    print('\n')
+    
+    # Method.
+    
+    print('{:<15s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}'\
+          .format('Method', 'OLS', '', 'OLS', '', 'OLS', '', 'OLS', '', ''))
+
+    print(80*'_')
+    print('Notes: Robust standard errors are shown below estimates. The level of observation')
+    print('is the cohort-ID number combination. War Eligible is a dummy that takes the value')
+    print('of one for the draft eligible from cohorts of 1962 and 1963. Navy Eligible is a  ')
+    print('dummy variable that takes the value of one for those ID numbers eligible to serve')
+    print('in the Navy. All models include cohort dummies.')
+    print('** Significant at 5 percent level.')
+    print(' * Significant at 10 percent level.')
