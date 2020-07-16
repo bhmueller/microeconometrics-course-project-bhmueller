@@ -655,3 +655,370 @@ def table_5():
     print('in the Navy. All models include cohort dummies.')
     print('** Significant at 5 percent level.')
     print(' * Significant at 10 percent level.')
+    
+# Extension table 4.
+def extension_table_4():
+    # Set up df etc.
+    constant, highnumber, conscription, crimerate, malvinas, navy, origin, cohorts, districts, hn_malvinas, df = get_variables()
+    
+    # Lists to fill with estimates.
+    reg_sm = []
+    pval_sm = []
+    std_sm = []
+    change_sm = []
+    
+    # No controls.
+    years = list(range(1958, 1963, 1))
+    for i in years:
+        df_reg = df[df.cohort == i].copy()
+        # Dependent variable: conscription.
+        rslts = IV2SLS(df_reg.loc[:, 'crimerate'], df_reg[constant], df_reg['sm'], df_reg['highnumber']).fit()
+        
+        # Get percent change.
+        ineligible_mean = df_reg['crimerate'][df_reg.highnumber == 0].mean()  # Mean crime rate of ineligible ID-groups by type of crime.
+        change = (100*(rslts.params.sm)/(ineligible_mean))
+    
+        reg_sm.append(rslts.params.sm)
+        pval_sm.append(rslts.pvalues.sm)
+        std_sm.append(rslts.std_errors.sm)
+        change_sm.append(change)
+    
+    width = 97    
+    print('\033[1m' 'Table E.4 - Estimated Impact of Conscription on Crime rates, for each Core Cohort Separately' '\033[0m')
+    print('\033[1m' '(Dependent Variable: Crime Rate)' '\033[0m')
+    print(width*'_')
+    
+    
+    for i in years:
+        if i == 1958:
+            print('{:<15s}'.format('Cohort'), end="")
+        print('{:>13.0f}{:<3s}'.format(i, ''), end="")
+    
+    print('\n')
+    
+    print('{:<15s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}'\
+          .format('', '(1)', '', '(2)', '', '(3)', '', '(4)', '', '(5)', '', ''))
+    print(width*'_')
+
+
+    for i in range(len(reg_sm)):
+        if i == 0:
+            print('{:<15s}'.format("Conscription"), end="")
+        print('\033[1m' '{:>13.5f}{:<3s}' '\033[0m'.format(reg_sm[i], significance(pval_sm[i])), end="")
+    
+    print('\n')
+
+    for i in range(len(std_sm)):
+        if i == 0:
+            print('{:<15s}'.format(''), end="")
+        print('{:>13.5f}{:<3s}'.format(std_sm[i], ''), end="")
+    
+    print('\n')
+
+    for i in range(len(change_sm)):
+        if i == 0:
+            print('{:<15s}'.format('Percent change'), end="")
+        print('\033[1m' '{:>13.2f}{:<3s}' '\033[0m'.format(change_sm[i], ''), end="")
+    
+    print('\n')
+
+    print('{:<15s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}'\
+          .format('Observations', '1000', '', '1000', '', '1000', '', '1000', '', '1000', '', ''))
+
+    print('{:<15s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}'\
+          .format('Method', '2SLS', '', '2SLS', '', '2SLS', '', '2SLS', '', '2SLS', '', ''))
+    print(width*'_')
+    print('Notes: Robust standard errors are shown below estimates. The level of observation is the cohort-')
+    print('ID number combination. The instrument for Conscription is Draft Eligible. Percent change is cal-')
+    print('culated as 100 × Estimate/mean crime rate of draft-ineligible men.')
+    print('** Significant at 5 percent level.')
+    print(' * Significant at 10 percent level.')
+
+# Extension table 4 with controls.
+def extension_table_4_controls():
+    # Set up df etc.
+    constant, highnumber, conscription, crimerate, malvinas, navy, origin, cohorts, districts, hn_malvinas, df = get_variables()
+    
+    # Lists to fill with estimates.
+    reg_sm = []
+    pval_sm = []
+    std_sm = []
+    change_sm = []
+    
+    # No controls.
+    years = list(range(1958, 1963, 1))
+    for i in years:
+        df_reg = df[df.cohort == i].copy()
+        # Dependent variable: conscription.
+        rslts = IV2SLS(df_reg.loc[:, 'crimerate'], df_reg[constant + districts + origin], df_reg['sm'], df_reg['highnumber']).fit()
+        
+        # Get percent change.
+        ineligible_mean = df_reg['crimerate'][df_reg.highnumber == 0].mean()  # Mean crime rate of ineligible ID-groups by type of crime.
+        change = (100*(rslts.params.sm)/(ineligible_mean))
+    
+        reg_sm.append(rslts.params.sm)
+        pval_sm.append(rslts.pvalues.sm)
+        std_sm.append(rslts.std_errors.sm)
+        change_sm.append(change)
+    
+    width = 97    
+    print('\033[1m' 'Table E.4 - Estimated Impact of Conscription on Crime rates, by Cohort with Controls' '\033[0m')
+    print('\033[1m' '(Dependent Variable: Crime Rate)' '\033[0m')
+    print(width*'_')
+    
+    
+    for i in years:
+        if i == 1958:
+            print('{:<15s}'.format('Cohort'), end="")
+        print('{:>13.0f}{:<3s}'.format(i, ''), end="")
+    
+    print('\n')
+    
+    print('{:<15s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}'\
+          .format('', '(1)', '', '(2)', '', '(3)', '', '(4)', '', '(5)', '', ''))
+    print(width*'_')
+
+
+    for i in range(len(reg_sm)):
+        if i == 0:
+            print('{:<15s}'.format("Conscription"), end="")
+        print('\033[1m' '{:>13.5f}{:<3s}' '\033[0m'.format(reg_sm[i], significance(pval_sm[i])), end="")
+    
+    print('\n')
+
+    for i in range(len(std_sm)):
+        if i == 0:
+            print('{:<15s}'.format(''), end="")
+        print('{:>13.5f}{:<3s}'.format(std_sm[i], ''), end="")
+    
+    print('\n')
+
+    for i in range(len(change_sm)):
+        if i == 0:
+            print('{:<15s}'.format('Percent change'), end="")
+        print('\033[1m' '{:>13.2f}{:<3s}' '\033[0m'.format(change_sm[i], ''), end="")
+    
+    print('\n')
+
+    print('{:<15s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}'\
+          .format('Observations', '1000', '', '1000', '', '1000', '', '1000', '', '1000', '', ''))
+
+    print('{:<15s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}'\
+          .format('Method', '2SLS', '', '2SLS', '', '2SLS', '', '2SLS', '', '2SLS', '', ''))
+    print(width*'_')
+    print('Notes: Robust standard errors are shown below estimates. The level of observation is the cohort-')
+    print('ID number combination. The instrument for Conscription is Draft Eligible. Percent change is cal-')
+    print('culated as 100 × Estimate/mean crime rate of draft-ineligible men. Models include district and')
+    print('origin dummies.')
+    print('** Significant at 5 percent level.')
+    print(' * Significant at 10 percent level.')
+    
+# Table 2.
+def table_2():
+    
+    # Get data.
+    constant, highnumber, conscription, crimerate, malvinas, navy, origin, cohorts, districts, hn_malvinas, df = get_variables()
+
+    equal_var = True
+    nan_policy = 'propagate'
+    # Get years (=cohorts) for loop.
+    years = list(range(1958, 1963, 1))
+    
+    # Lists to fill with statistics for each subgroup.
+    t_arg = []
+    pval_arg = []
+    
+    t_ind = []
+    pval_ind = []
+    
+    t_nat = []
+    pval_nat = []
+    
+    # Argentine.
+    for i in years:
+        a = df.argentine[df.cohort == i][df.highnumber == 0].copy()
+        b = df.argentine[df.cohort == i][df.highnumber == 1].copy()
+        ttest = stats.ttest_ind(a, b, axis=0, equal_var=equal_var, nan_policy=nan_policy)
+        t_arg.append(ttest.statistic)
+        pval_arg.append(ttest.pvalue)
+        
+    # Indigenous.
+    for i in years:
+        a = df.indigenous[df.cohort == i][df.highnumber == 0].copy()
+        b = df.indigenous[df.cohort == i][df.highnumber == 1].copy()
+        ttest = stats.ttest_ind(a, b, axis=0, equal_var=equal_var, nan_policy=nan_policy)
+        t_ind.append(ttest.statistic)
+        pval_ind.append(ttest.pvalue) 
+        
+    # Naturalized.
+    for i in years:
+        a = df.naturalized[df.cohort == i][df.highnumber == 0].copy()
+        b = df.naturalized[df.cohort == i][df.highnumber == 1].copy()
+        ttest = stats.ttest_ind(a, b, axis=0, equal_var=equal_var, nan_policy=nan_policy)
+        t_nat.append(ttest.statistic)
+        pval_nat.append(ttest.pvalue)
+    
+    # Print table.
+    width = 110    
+    print('\033[1m' 'Table 2 - Differences in Pre-Treatment Characteristics by Birth Cohort and Eligibility Group' '\033[0m')
+    print('\033[1m' 'Differences by Cohort (draft exempt - draft eligible)' '\033[0m')
+    print(width*'_')
+    
+    
+    for i in years:
+        if i == 1958:
+            print('{:<30s}'.format('Cohort'), end="")
+        print('{:>13.0f}{:<3s}'.format(i, ''), end="")
+    
+    print('\n')
+    
+    print(width*'_')
+    
+    # Argentine
+    for i in range(len(t_arg)):
+        if i == 0:
+            print('{:<30s}'.format('Argentine-born, not indigenous'), end='')
+        print('\033[1m' '{:>13.5f}{:<3s}' '\033[0m'.format(t_arg[i], significance(pval_arg[i])), end="")
+    
+    print('\n')
+
+    for i in range(len(pval_arg)):
+        if i == 0:
+            print('{:<30s}'.format(''), end="")
+        print('{:>13.5f}{:<3s}'.format(pval_arg[i], ''), end="")
+    
+    print('\n')
+    
+    # Indig.
+    for i in range(len(t_ind)):
+        if i == 0:
+            print('{:<30s}'.format('Argentine-born, indigenous'), end='')
+        print('\033[1m' '{:>13.5f}{:<3s}' '\033[0m'.format(t_ind[i], significance(pval_ind[i])), end="")
+    
+    print('\n')
+
+    for i in range(len(pval_ind)):
+        if i == 0:
+            print('{:<30s}'.format(''), end="")
+        print('{:>13.5f}{:<3s}'.format(pval_ind[i], ''), end="")
+    
+    print('\n')
+    
+    # Naturalized.
+    
+    for i in range(len(t_nat)):
+        if i == 0:
+            print('{:<30s}'.format('Born abroad, naturalized'), end='')
+        print('\033[1m' '{:>13.5f}{:<3s}' '\033[0m'.format(t_nat[i], significance(pval_nat[i])), end="")
+    
+    print('\n')
+
+    for i in range(len(pval_nat)):
+        if i == 0:
+            print('{:<30s}'.format(''), end="")
+        print('{:>13.5f}{:<3s}'.format(pval_nat[i], ''), end="")
+    
+    print('\n')
+    
+    print(width*'_')
+    print('Notes: P-values are shown below test statistics. The level of observation is the cohort-ID number combination.')
+    
+# Table 3.
+# Define data set.
+def table_3():
+    # Get variables.
+    constant, highnumber, conscription, crimerate, malvinas, navy, origin, cohorts, districts, hn_malvinas, df = get_variables()
+    
+    df_regression = df[df.cohort > 1957][df.cohort < 1963].copy()
+    years_tab3 = list(range(1957, 1963, 1))  # 1957 included to get 6 instead of 5 columns (1 repeated cross-section + 5 separate cross-sections)
+    estim_hn = []  # List for estimates for 'highnumber'.
+    estim_const = []  # List for estimates for 'constant'.
+    std_hn = []  # List for standard errors for 'highnumber'.
+    std_const = []
+    pval_hn = []
+    pval_const = []
+    
+    for i in years_tab3:
+    
+        if i < 1958:
+        
+            X = df_regression[highnumber + cohorts[29: 33] + constant].copy()
+            y = df_regression.loc[:, 'sm']
+            # Fit OLS model.
+            rslts = sm.OLS(y, X, cov_type='cluster').fit()
+        
+            #df_regression['fitted_conscription'] = rslts.fittedvalues
+        
+            estim_hn.append(rslts.params['highnumber'])
+            std_hn.append(rslts.HC0_se['highnumber'])
+            estim_const.append(rslts.params['constant'])
+            std_const.append(rslts.HC0_se['constant'])
+            pval_hn.append(rslts.pvalues['highnumber'])
+            pval_const.append(rslts.pvalues['constant'])
+        
+        else:
+        
+            df_regression = df[df.cohort == i].copy()
+            X = df_regression[['highnumber', 'constant']].copy()
+            y = df_regression.loc[:, 'sm']
+            rslts = sm.OLS(y, X).fit()
+        
+            estim_hn.append(rslts.params['highnumber'])
+            std_hn.append(rslts.HC0_se['highnumber'])
+            estim_const.append(rslts.params['constant'])
+            std_const.append(rslts.HC0_se['constant'])
+            pval_hn.append(rslts.pvalues['highnumber'])
+            pval_const.append(rslts.pvalues['constant'])
+            
+    print('\033[1m' 'Table 3 - First Stage by Birth Cohort' '\033[0m')
+    print('Dependent Variable: Conscription')
+    print(112*'_')
+    # Header.
+    print('{:<15s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}'\
+          .format('Cohort', '1958-1962', '', "1958", '', "1959", '', "1960", '', "1961", '', "1962", '', \
+                 '', ''))
+    print('{:<15s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}'\
+          .format('', '(1)', '', '(2)', '', '(3)', '', '(4)', '', '(5)', '', '(6)', '', \
+                 '', ''))
+    print(112*'_')
+
+
+    for i in range(len(estim_hn)):
+        if i == 0:
+            print('{:<15s}'.format('Draft Eligible'), end="")
+        print('\033[1m' '{:>13.4f}{:<3s}' '\033[0m'.format(estim_hn[i], significance(pval_hn[i])), end="")
+    
+    print('\n')
+
+    for i in range(len(std_hn)):
+        if i == 0:
+            print('{:<15s}'.format(''), end="")
+        print('{:>13.4f}{:<3s}'.format(std_hn[i], ''), end="")
+    
+    print('\n')
+
+    for i in range(len(estim_const)):
+        if i == 0:
+            print('{:<15s}'.format("Constant"), end="")
+        print('\033[1m' '{:>13.4f}{:<3s}' '\033[0m'.format(estim_const[i], significance(pval_const[i])), end="")
+    
+    print('\n')
+
+    for i in range(len(std_const)):
+        if i == 0:
+            print('{:<15s}'.format(''), end="")
+        print('{:>13.4f}{:<3s}'.format(std_const[i], ''), end="")
+    
+    print('\n')
+
+    print('{:<15s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}'\
+          .format('Observations', '5,000', '', '1,000', '', '1,000', '', '1,000', '', '1,000', '', '1,000', '', \
+                '', ''))
+
+    print('{:<15s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}'\
+          .format('Method', 'OLS', '', 'OLS', '', 'OLS', '', 'OLS', '', 'OLS', '', 'OLS', '', \
+                 '', ''))
+    print(112*'_')
+    print('Notes: Robust standard errors are shown below estimates. The level of observation is the cohort-ID number combi-')
+    print('nation. Column 1 includes cohort dummies.')
+    print('*** Significant at 1 percent level.')
