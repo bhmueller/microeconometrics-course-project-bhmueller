@@ -112,9 +112,9 @@ def binned_plot(df, bin_num, ylim, years):
         binned_stats = stats.binned_statistic(x=df[df.cohort == i].draftnumber, values=df[df.cohort == i].enfdummy, 
                                               statistic='mean', bins=bins)
         df_bin = pd.DataFrame()
-        df_bin['Crime rate'] = binned_stats.statistic
+        df_bin['Failure rate'] = binned_stats.statistic
         df_bin['Draftnumber'] = bins[1: bin_num+1]
-        df_bin.plot.line(x='Draftnumber', y='Crime rate', title=f'Crime Rates for Cohort {i}', ylim=ylim)
+        df_bin.plot.line(x='Draftnumber', y='Failure rate', title=f'Failure Rates for Cohort {i}', ylim=ylim)
         
 # Regressions (initially for table 4).
 def regress(df, method, cohort_range, cohort_dummies, controls):
@@ -1235,13 +1235,14 @@ def figure_A_2(df, bin_num, ylim, years):
         df_bin['Draftnumber'] = bins[1: bin_num+1]
         df_bin.plot.line(x='Draftnumber', y='Conscription rate', title=f'Conscription Rates for Cohort {i}', ylim=ylim)
 
-# Section 3 1
+# Section 3 1958-1962 Fake cutoffs.
 def table_test_fake_cutoff_1(df, draft_status):
     '''
     df data frame
     highnumber = 1 or highnumber = 0 test for draft eligible and exempt group
     
     '''
+    years = list(range(1958, 1963, 1))
     constant, highnumber, conscription, crimerate, malvinas, navy, origin, cohorts, districts, hn_malvinas, df = get_variables()
     width = 100
     # Print header.
@@ -1272,6 +1273,61 @@ def table_test_fake_cutoff_1(df, draft_status):
                            axis=0, equal_var=False, nan_policy='propagate')
             t_q.append(test.statistic)
             p_q.append(test.pvalue)
+        for i in range(len(t_q)):
+            if i == 0:
+                print('{:<9s}{:>5.1f}'.format('Decile', q), end='')
+            print('\033[1m' '{:>13.4f}{:<3s}' '\033[0m'.format(t_q[i], significance(p_q[i])), end="")
+        print('\n')
+
+        for i in range(len(p_q)):
+            if i == 0:
+                print('{:<14s}'.format(''), end="")
+            print('{:>13.4f}{:<3s}'.format(p_q[i], ''), end="")
+        print('\n')
+    print(width*'_')
+    print('Notes: P-values are shown below test statistics. The level of observation is the cohort-ID number ')
+    print('combination. Fake eligibility status computed by using only real draft exempt cohort-ID groups.')
+    print('Deciles refer to the different cutoffs generated.')
+    print('** Significant at 10 percent level.')
+    print(' * Significant at 5 percent level.')
+
+    
+# Fake cutoff test for 1976.
+def table_test_fake_cutoff_2(df):
+    '''
+    df data frame
+    highnumber = 1 or highnumber = 0 test for draft eligible and exempt group
+    
+    '''
+    constant, highnumber, conscription, crimerate, malvinas, navy, origin, cohorts, districts, hn_malvinas, df = get_variables()
+    width = 100
+    # Print header.
+    print('\033[1m' 'Table B.3 - Differences in Crime Rates and Fake Eligibility Group for Cohort 1976' '\033[0m')
+    print(width*'_')
+    print('\033[1m' 'Differences (fake draft exempt - fake draft eligible)' '\033[0m')
+    print(width*'_')
+    
+    print('{:<14s}'.format('Cohort'), end="")
+    print('{:>13s}{:<3s}'.format('1976', ''), end="")
+    print('\n')
+    
+    # Container for test-stats & p-value.
+    t_q = []
+    p_q = []
+    
+
+    for q in np.linspace(0.1, 1, 9,endpoint=False):
+        # Reset container.
+        t_q = []
+        p_q = []
+        c = 1976
+        dfa = df[df.cohort == c][['crimerate', 'draftnumber']].copy()
+        
+        fake_cutoff = dfa.draftnumber.quantile(q)
+        test = stats.ttest_ind(dfa.crimerate[(dfa.draftnumber > fake_cutoff)], dfa.crimerate[dfa.draftnumber < fake_cutoff],
+                        axis=0, equal_var=False, nan_policy='propagate')
+        t_q.append(test.statistic)
+        p_q.append(test.pvalue)
         for i in range(len(t_q)):
             if i == 0:
                 print('{:<9s}{:>5.1f}'.format('Decile', q), end='')
