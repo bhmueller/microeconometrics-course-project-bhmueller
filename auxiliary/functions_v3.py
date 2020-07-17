@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jul 14 22:42:19 2020
+Created on Fri Jul 17 02:02:36 2020
 
 @author: admin
 """
+
 
 ##Functions for replication study
 
@@ -129,7 +130,7 @@ def regress(df, method, cohort_range, cohort_dummies, controls):
     if method == 'OLS':
         if controls == 'y':
             vars_controls = highnumber + cohort_dummies + origin + districts + constant
-            df = df[(df.cohort >= cohort_range[0]) & (df.cohort <= cohort_range[1])][vars_controls + crimerate].dropna().copy()
+            df = df[df.cohort >= cohort_range[0]][df.cohort <= cohort_range[1]][vars_controls + crimerate].dropna().copy()
             X = df[vars_controls].copy()
             y = df.loc[:, 'crimerate']
                 
@@ -138,7 +139,7 @@ def regress(df, method, cohort_range, cohort_dummies, controls):
         
         if controls == 'n':
             vars_no_controls = highnumber + cohort_dummies + constant
-            df = df[(df.cohort >= cohort_range[0]) & (df.cohort <= cohort_range[1])][vars_no_controls + crimerate].dropna().copy()
+            df = df[df.cohort >= cohort_range[0]][df.cohort <= cohort_range[1]][vars_no_controls + crimerate].dropna().copy()
             X = df[vars_no_controls].copy()
             y = df.loc[:, 'crimerate']
                 
@@ -150,7 +151,7 @@ def regress(df, method, cohort_range, cohort_dummies, controls):
         if controls == 'y':
             cohorts=cohorts[29: 33]
             vars_controls = highnumber + conscription + cohort_dummies + origin + districts + constant
-            df = df[(df.cohort >= cohort_range[0]) & (df.cohort <= cohort_range[1])][vars_controls + crimerate].copy().dropna(axis=0)
+            df = df[df.cohort >= cohort_range[0]][df.cohort <= cohort_range[1]][vars_controls + crimerate].copy().dropna(axis=0)
             y = df.loc[:, 'crimerate']
             
             rslts = IV2SLS(y, df[constant + cohorts + origin + districts], df['sm'], df['highnumber']).fit()
@@ -159,7 +160,7 @@ def regress(df, method, cohort_range, cohort_dummies, controls):
         if controls == 'n':
             cohorts=cohorts[29: 33]
             vars_no_controls = highnumber + conscription + cohort_dummies + constant
-            df = df[(df.cohort >= cohort_range[0]) & (df.cohort <= cohort_range[1])][vars_no_controls + crimerate].copy().dropna(axis=0)
+            df = df[df.cohort >= cohort_range[0]][df.cohort <= cohort_range[1]][vars_no_controls + crimerate].copy().dropna(axis=0)
             y = df.loc[:, 'crimerate']
             
             rslts = IV2SLS(y, df[constant + cohorts], df['sm'], df['highnumber']).fit()
@@ -396,7 +397,7 @@ def table_4(df):
 # Table 6.
 def table_6():
     constant, highnumber, conscription, crimerate, malvinas, navy, origin, cohorts, districts, hn_malvinas, df = get_variables()
-    df_reg = df[df.cohort > 1957][df.cohort < 1966].copy().dropna()
+    df_reg = df[df.cohort > 1957][df.cohort < 1963].copy()
 
     reg_sm = []
     pval_sm = []
@@ -485,7 +486,7 @@ def table_5():
     
     # Col 1.
     
-    df_29_65 = df[df.cohort >= 1929][df.cohort <= 1965][highnumber + hn_malvinas + constant + cohorts[0:36] + crimerate].copy().dropna(axis=0)
+    df_29_65 = df[df.cohort > 1928][df.cohort < 1966][highnumber + hn_malvinas + constant + cohorts[0:36] + crimerate].copy().dropna(axis=0)
     X = df_29_65[highnumber + hn_malvinas + constant + cohorts[0:36]].copy()
     y = df_29_65.loc[:, 'crimerate']
     rslts = sm.OLS(y, X).fit()
@@ -521,7 +522,7 @@ def table_5():
     
     # Col 3.
     
-    df_29_65 = df[df.cohort >= 1929][df.cohort < 1966][highnumber + navy + constant + cohorts[0:36] + crimerate].copy().dropna(axis=0)
+    df_29_65 = df[df.cohort > 1928][df.cohort < 1966][highnumber + navy + constant + cohorts[0:36] + crimerate].copy().dropna(axis=0)
     X = df_29_65[highnumber + navy + constant + cohorts[0:36]].copy()
     y = df_29_65.loc[:, 'crimerate']
     rslts = sm.OLS(y, X).fit()
@@ -819,7 +820,7 @@ def table_2():
     # Get data.
     constant, highnumber, conscription, crimerate, malvinas, navy, origin, cohorts, districts, hn_malvinas, df = get_variables()
 
-    equal_var = True
+    equal_var = False
     nan_policy = 'propagate'
     # Get years (=cohorts) for loop.
     years = list(range(1958, 1963, 1))
@@ -929,7 +930,7 @@ def table_3():
     # Get variables.
     constant, highnumber, conscription, crimerate, malvinas, navy, origin, cohorts, districts, hn_malvinas, df = get_variables()
     
-    df_regression = df[(df.cohort > 1957) & (df.cohort < 1963)].copy()
+    df_regression = df[df.cohort > 1957][df.cohort < 1963].copy()
     years_tab3 = list(range(1957, 1963, 1))  # 1957 included to get 6 instead of 5 columns (1 repeated cross-section + 5 separate cross-sections)
     estim_hn = []  # List for estimates for 'highnumber'.
     estim_const = []  # List for estimates for 'constant'.
@@ -1054,7 +1055,7 @@ def table_7_IV():
     
     # Print header.
     width = 95
-    print('\033[1m' 'Table 7 - Estimated Impact of Conscription on Labour Merket Outcomes' '\033[0m')
+    print('\033[1m' 'Table 7 - Estimated Impact of Conscription on Labour Market Outcomes' '\033[0m')
     print(width*'_')
     
     print('{:<15s}{:>17s}{:<3s}{:>17s}{:<3s}{:>17s}{:<3s}{:>17s}'\
@@ -1077,26 +1078,139 @@ def table_7_IV():
             print('\033[1m' '{:>17.5f}{:<3s}' '\033[0m'.format(est_sm[i], significance(pval_sm[i])), end="")
     print('\n')
     
+    # Standard errors.
     for i in range(len(std_sm)):
         if i == 0:
             print('{:<15s}'.format(''), end="")
         if type(est_sm[i]) == str:
-            print('{:>17s}{:<3s}'.format('', ''), end="")
+            print('{:>17s}{:<3s}'.format(''), end="")
         else:
-            print('{:>17.4f}{:<3s}'.format(std_sm[i], ''), end="")
+            print('\033[1m' '{:>17.4f}{:<3s}' '\033[0m'.format(std_sm[i], ''), end="")
     print('\n')
-    
+                  
     # Percent change.
     for i in range(len(percent_change)):
         if i == 0:
             print('{:<15s}'.format('Percent change'), end="")
-        print('\033[1m' '{:>17.2f}{:<3s}' '\033[0m'.format(percent_change[i], ''), end="")
+        print('{:>17.2f}{:<3s}'.format(percent_change[i], ''), end="")
     print('\n')
+    
+    # Number of observations.
     for i in range(len(n_obs)):
         if i == 0:
             print('{:<15s}'.format('Observations'), end="")
-        print('\033[1m' '{:>17.0f}{:<3s}' '\033[0m'.format(n_obs[i], ''), end="")
+        print('{:>17.0f}{:<3s}'.format(n_obs[i], ''), end="")
     print('\n')
+    
     print('{:<15s}{:>17s}{:<3s}{:>17s}{:<3s}{:>17s}{:<3s}{:>17s}'\
           .format('', '2SLS', '', '2SLS', '', '2SLS', '', ''))
-    print(width*'_') 
+    print(width*'_')
+    
+    print('Notes: Robust standard errors are shown below estimates. The level of observation is the cohort-')
+    print('ID number combination. Participation in the formal job market is as of 2004. Unemployment rates ')
+    print('and earnings are as of 2003. Earnings are hourly earnings in Argentine pesos. All models include')
+    print('cohort dummies. The instrument for Conscription is Draft Eligible. Percent change is calculated ')
+    print('as 100 × Estimate/mean dependent variable of draft-ineligible men.')
+
+# Table B.1.
+def table_B_1():
+    '''
+    Gives summary statistics for the core cohorts 1958-1962.
+    '''
+    
+    path = ('data/baseB.dta')
+    baseb = pd.read_stata(path)
+    
+    # Get variables.
+    constant, highnumber, conscription, crimerate, malvinas, navy, origin, cohorts, districts, hn_malvinas, df = get_variables()
+    formal = ['formal']
+    unemployment = ['unemployment']
+    income = ['income']
+    arms = ['arms']
+    sexual = ['sexual']
+    whitecollar = ['whitecollar']
+    
+    df_reg = df[(df.cohort > 1957) & (df.cohort < 1963)].copy()
+    
+    core_variables = [highnumber, conscription, crimerate, formal, unemployment, income, arms, sexual, whitecollar, navy, hn_malvinas]
+    #var_names = {['sm']: 'Conscription', ['crimerate']: 'Crime rate', ['formal']: 'Formal job market', ['unemployment']:'Unemployment rate', \
+    #             ['earnings']: 'Earnings'}
+    
+    width = 110
+    print('\033[1m' 'Table B.1 - Descriptive Statistics of Selected Variables of Interest for Male Birth Cohorts 1958 to 1962' '\033[0m')
+    print(width*'_')
+    
+    # Header: Mean, STD, etc.
+    print('{:<17s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}'\
+          .format('', '(1)', '', '(2)', '', '(3)', '', '(4)', '', '(5)', '', \
+                  '', ''))
+    print('{:<17s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}{:<3s}{:>13s}'\
+          .format('', 'Number', '', 'Mean', '', 'St. dev.', '', 'Mean eligible', '', \
+                  'Mean exempt', '', ''))
+    print(width*'_')
+    print('Variables: \n')
+    for i in core_variables:
+        
+        var_list = []
+        
+        # Number mean.
+        #stat = len(df_reg[i])
+        #var_list.append(stat)
+
+        stat = df_reg[i].mean()
+        var_list.append(stat[0]*baseb.sizecohort[(df.cohort > 1957) & (df.cohort < 1963)].mean()*1000)
+        
+        # Mean.
+        stat = df_reg[i].mean()
+        var_list.append(stat[0])
+        
+        # Standard dev.
+        stat = df_reg[i].std()
+        var_list.append(stat[0])
+        
+        # Cond. mean.
+        
+        if i == highnumber:
+            #stat = df_reg[i].mean()
+            var_list.append(1)
+            
+            #stat = df_reg[i].mean()
+            #var_list.append(stat[0]*baseb.sizecohort[(df.cohort > 1957) & (df.cohort < 1963)].mean()*1000)
+        
+            var_list.append(0)
+        
+            #var_list.append((1-stat[0])*baseb.sizecohort[(df.cohort > 1957) & (df.cohort < 1963)].mean()*1000)
+            
+        else:
+            
+            stat = df_reg[i][df_reg.highnumber == 1].mean()
+            var_list.append(stat[0])
+        
+            #var_list.append(stat[0]*(df_reg[i].mean()*baseb.sizecohort[(df.cohort > 1957) & (df.cohort < 1963)].mean())*1000)
+        
+            stat = df_reg[i][df_reg.highnumber == 0].mean()
+            var_list.append(stat[0])
+        
+            #var_list.append(stat[0]*(df_reg[i].mean()*baseb.sizecohort[(df.cohort > 1957) & (df.cohort < 1963)].mean())*1000)
+        
+        # t-test.
+        #a = df_reg[i][df_reg.highnumber == 0].copy()
+        #b = df_reg[i][df_reg.highnumber == 1].copy()
+        #ttest = stats.ttest_ind(a, b, axis=0, equal_var=False, nan_policy='propagate')
+        #var_list.append(ttest.pvalue[0])
+        
+        for d in range(len(var_list)):
+            if d == 0:
+                print('{:<17s}'.format(str(i)), end="")
+            if var_list[d] >= 100:
+                print('\033[1m' '{:>13.0f}{:<3s}' '\033[0m'.format(var_list[d], ''), end="")
+            else:
+                print('\033[1m' '{:>13.4f}{:<3s}' '\033[0m'.format(var_list[d], ''), end="")
+        print('\n')
+    print(width*'_')
+    print('Notes: highnumber = draft eligible, sm = conscription, formal = formal job market participation, income = ')
+    print('hourly earnings in Argentine pesos,arms = crimes involving usage of weapons, sexual = sexual attack, white-')
+    print('collar = white collar crimes (such as fraud, scams, extortion), navy = eligible for navy, hn_malvinas = eli-')
+    print('gible during Falklands War. The number in column 1 contains the mean number of individuals in the subgroup. ') 
+    print('It was calculated by using the mean size of cohorts from 1958 to 1962, which is 236,656. Columns 4 and 5 con-')
+    print('tain means conditional on draft eligible and draft exempt cohort-ID groups.')
