@@ -23,7 +23,7 @@ Galiani, Sebastian, Martín A. Rossi, and Ernesto Schargrodsky. 2011. "Conscript
 ## Summary
 
 Galiani et al. (2011) aim at studying the causal effect of serving in the military on subsequent criminal behaviour. They use administrative data on the Argentine draft lottery and criminal records. Since failing medical examination before being drafted is endogenous, the authors instrument conscription by *draft eligible*, a variable indicating whether a unit of observation was randomly chosen to join military service. The unit of observation is all individuals of a birth cohort sharing the same last three digits of the national ID.
-The authors find a positive and statistically significant causal effect of conscription on developing a criminal record.
+The authors find a positive and statistically significant causal effect of conscription on developing a criminal record. The novelty of the paper is that they study the effect of peactime military service.
 
 I replicate the findings of Galiani et al. (2011). Further, I discuss the identification strategy by drawing on the potential outcome model of instrumental variable estimation by Imbens and Angrist (1994) and causal graphs. I extend the authors' analysis by providing additional suggestive evidence of the exogeneity of the instrument.
 
